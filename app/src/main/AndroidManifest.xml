@@ -17,7 +17,13 @@
         </activity>
         <activity android:name=".setAlarmActivity" />
         <activity android:name=".AlarmRingingActivity" />
-        <activity android:name=".AlarmListActivity"></activity>
+        <activity android:name=".AlarmListActivity"/>
+        <activity android:name=".GameModeActivity"/>
+        <activity android:name=".JumpActivity"/>
+        <activity android:name=".JumpScoreActivity"/>
+
+        <activity android:name=".maze.MazeActivity"
+            android:theme="@style/AppTheme.MazeTheme"/>
     </application>
 
 </manifest>
