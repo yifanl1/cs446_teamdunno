@@ -1,4 +1,12 @@
 <resources>
     <string name="app_name">Challenge Alarm</string>
     <string name="title_activity_alarm_list">AlarmListActivity</string>
+    <string name="sg">Start Game</string>
+    <string name="ll">hello</string>
+    <string name="rt">Return</string>
+    <string name="res1">You Lose</string>
+    <string name="Set">Settings</string>
+    <string name="Jump">Jump</string>
+    <string name="Restr">Restart</string>
+    <string name="Back">Main Menu</string>
 </resources>
