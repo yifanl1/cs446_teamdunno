@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.view.View;
 
+import com.example.cosine.myapplication.maze.MazeActivity;
+
 public class GameModeActivity extends AppCompatActivity {
 
     Button jumpButton;
@@ -23,6 +25,17 @@ public class GameModeActivity extends AppCompatActivity {
                Intent intent = new Intent(GameModeActivity.this, JumpActivity.class);
                startActivity(intent);
            }
+        });
+
+
+        Button mazeButton = findViewById(R.id.maze);
+
+        mazeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
+                Intent intent = new Intent(GameModeActivity.this, MazeActivity.class);
+                startActivity(intent);
+            }
         });
     }
 }

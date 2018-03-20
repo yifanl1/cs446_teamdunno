@@ -121,14 +121,14 @@ public class setAlarmActivity extends AppCompatActivity {
                                 for (i=0;i<7;i++){
                                     if (daysChecked[i]){
                                         total=total+1;
-                                        if (s==""){
+                                        if (s.equals("")){
                                             s=weekDays[i];
                                         } else {
                                             s=s+", "+weekDays[i];
                                         }
                                     }
                                 }
-                                if (s==""){
+                                if (s.equals("")){
                                     s="Repeat: Never";
                                     repeatInfo.setText(s);
                                 } else {
@@ -146,7 +146,7 @@ public class setAlarmActivity extends AppCompatActivity {
                                         }
                                     }
                                     if (total==5){
-                                        if (daysChecked[5]==false && daysChecked[6]==false){
+                                        if (!daysChecked[5] && !daysChecked[6]){
                                             s="Repeat: Weekdays";
                                             repeatInfo.setText(s);
                                         } else {
