@@ -8,7 +8,6 @@ import android.widget.*;
 import android.view.*;
 import android.content.*;
 import android.app.*;
-import android.util.*;
 
 import java.util.*;
 
@@ -17,14 +16,20 @@ public class setAlarmActivity extends AppCompatActivity {
     AlarmManager alarmManager;
     Button setButton;
     Button changeButton;
+    Button changeButton2;
+    Button changeButton3;
     TimePicker timePicker;
     Intent intent;
     PendingIntent pi;
     Calendar c;
     TextView repeatInfo;
+    TextView gameInfo;
+    TextView ringtoneInfo;
     boolean repeatWKDs[];
     boolean daysChecked[];
     String weekDays[];
+    String games[];
+    String sampleSongList[];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +45,12 @@ public class setAlarmActivity extends AppCompatActivity {
         repeatWKDs=new boolean[]{false, false, false, false, false, false ,false};
         daysChecked=new boolean[]{false, false, false, false, false, false ,false};
         weekDays=new String[]{"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"};
+        games=new String[]{"Math", "Jump", "Maze", "2048"};
+        sampleSongList=new String[]{"Finesse","I Want You To Know","One Last Time","Perfect","Rockstar"};
 
         repeatInfo=(TextView)findViewById(R.id.repeat);
+        gameInfo=(TextView)findViewById(R.id.challenge);
+        ringtoneInfo=(TextView)findViewById(R.id.ringtone);
 
         setButton=(Button)findViewById(R.id.set);
         setButton.setOnClickListener(new View.OnClickListener(){
@@ -80,6 +89,7 @@ public class setAlarmActivity extends AppCompatActivity {
                 alarmManager.set(AlarmManager.RTC_WAKEUP,ringTime,pi);
 
                 Toast.makeText(setAlarmActivity.this,"Alarm is set to "+shour+":"+sminute,Toast.LENGTH_SHORT).show();
+                changetoMain();
             }
         });
 
@@ -161,6 +171,41 @@ public class setAlarmActivity extends AppCompatActivity {
             }
         });
 
+        changeButton2=(Button)findViewById(R.id.change2);
+        changeButton2.setOnClickListener(new View.OnClickListener(){
+           @Override
+           public void onClick(View v){
+               AlertDialog ad=new AlertDialog.Builder(setAlarmActivity.this).setTitle("Choose Challenge")
+                       .setSingleChoiceItems(games,-1,new AlertDialog.OnClickListener(){
+                           @Override
+                           public void onClick(DialogInterface dialog, int which){
+                               gameInfo.setText("Challenge: "+games[which]);
+                               dialog.dismiss();
+                           }
+                       }).show();
+           }
+        });
+
+        changeButton3=(Button)findViewById(R.id.change3);
+        changeButton3.setOnClickListener(new View.OnClickListener(){
+           @Override
+           public void onClick(View v){
+               AlertDialog ad=new AlertDialog.Builder(setAlarmActivity.this).setTitle("Choose Ringtone")
+                       .setSingleChoiceItems(sampleSongList,-1,new AlertDialog.OnClickListener(){
+                           @Override
+                           public void onClick(DialogInterface dialog, int which){
+                               ringtoneInfo.setText("Ringtone: "+sampleSongList[which]);
+                               dialog.dismiss();
+                           }
+                       }).show();
+           }
+        });
+
+    }
+
+    public void changetoMain() {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
     }
 
 }
