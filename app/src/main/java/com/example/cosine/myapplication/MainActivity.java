@@ -11,6 +11,7 @@ import android.view.View;
 public class MainActivity extends AppCompatActivity {
 
     Button sa;
+    Button gm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +26,14 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
+        gm=(Button)findViewById(R.id.gameMode);
+        gm.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Intent intent = new Intent(MainActivity.this, GameModeActivity.class);
+                startActivity(intent);
+            }
+        });
 
     }
 }
