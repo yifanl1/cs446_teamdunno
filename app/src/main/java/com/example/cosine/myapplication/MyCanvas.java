@@ -48,6 +48,8 @@ public class MyCanvas extends View {
 
 
     ArrayList<int[]>  coords = new ArrayList<int[]>();
+    ArrayList<Integer> colors = new ArrayList<Integer>();
+
 
     void setStPos(int l, int t, int r, int b) {
         left  = l;
@@ -72,10 +74,14 @@ public class MyCanvas extends View {
         right = r;
         top = t;
         bottom = b;
+        Random rnd = new Random();
+        int col = Color.argb(255, rnd.nextInt(256),rnd.nextInt(256),rnd.nextInt(256));
+        colors.add(col);
     }
 
     void removeRect() {
         coords.remove(0);
+        colors.remove(0);
     }
 
     void drawPlayer(float l, float t, float r, float b) {
@@ -100,7 +106,7 @@ public class MyCanvas extends View {
     @Override
     protected void onDraw(Canvas canvas)  {
         super.onDraw(canvas);
-        paint.setColor(Color.BLUE);
+        //paint.setColor(Color.BLUE);
         paint.setStrokeWidth(0);
 
         // draw rect
@@ -113,6 +119,7 @@ public class MyCanvas extends View {
             float top = coords.get(size)[1];
             float right = coords.get(size)[2];
             float bottom = coords.get(size)[3];
+            paint.setColor(colors.get(size));
             canvas.drawRect(left,top,right,bottom,paint);
         }
 
@@ -189,6 +196,7 @@ public class MyCanvas extends View {
         invalidate();
 
     }
+
 
 
 }

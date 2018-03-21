@@ -19,8 +19,10 @@ public class setAlarmActivity extends AppCompatActivity {
     Button changeButton2;
     Button changeButton3;
     TimePicker timePicker;
-    Intent intent;
-    PendingIntent pi;
+    Intent mathIntent;
+    PendingIntent mathPi;
+    Intent gameIntent;
+    PendingIntent gamePi;
     Calendar c;
     TextView repeatInfo;
     TextView gameInfo;
@@ -29,15 +31,13 @@ public class setAlarmActivity extends AppCompatActivity {
     boolean daysChecked[];
     String weekDays[];
     String games[];
+    String challengeName;
     String sampleSongList[];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_alarm);
-
-        intent=new Intent(this,AlarmRingingActivity.class);
-        pi=PendingIntent.getActivity(this,0,intent,0);
 
         timePicker=(TimePicker)findViewById(R.id.timePicker);
         alarmManager=(AlarmManager)getSystemService(ALARM_SERVICE);
@@ -47,6 +47,7 @@ public class setAlarmActivity extends AppCompatActivity {
         weekDays=new String[]{"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"};
         games=new String[]{"Math", "Jump", "Maze", "2048"};
         sampleSongList=new String[]{"Finesse","I Want You To Know","One Last Time","Perfect","Rockstar"};
+        challengeName="Math";
 
         repeatInfo=(TextView)findViewById(R.id.repeat);
         gameInfo=(TextView)findViewById(R.id.challenge);
@@ -86,7 +87,14 @@ public class setAlarmActivity extends AppCompatActivity {
                 if (ringTime<currentTime){
                     ringTime=ringTime+timeOfDay;
                 }
-                alarmManager.set(AlarmManager.RTC_WAKEUP,ringTime,pi);
+                setIntents();
+                if (challengeName.equals("Math")) {
+                    alarmManager.set(AlarmManager.RTC_WAKEUP,ringTime,mathPi);
+
+                } else {
+                    alarmManager.set(AlarmManager.RTC_WAKEUP,ringTime,gamePi);
+                }
+
 
                 Toast.makeText(setAlarmActivity.this,"Alarm is set to "+shour+":"+sminute,Toast.LENGTH_SHORT).show();
                 changetoMain();
@@ -180,6 +188,7 @@ public class setAlarmActivity extends AppCompatActivity {
                            @Override
                            public void onClick(DialogInterface dialog, int which){
                                gameInfo.setText("Challenge: "+games[which]);
+                               challengeName=games[which];
                                dialog.dismiss();
                            }
                        }).show();
@@ -204,8 +213,20 @@ public class setAlarmActivity extends AppCompatActivity {
     }
 
     public void changetoMain() {
+        /*
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
+        */
+        setAlarmActivity.this.finish();
+    }
+
+    public void setIntents(){
+        mathIntent=new Intent(this,AlarmRingingActivity.class);
+        mathPi=PendingIntent.getActivity(this,0,mathIntent,0);
+
+        gameIntent=new Intent(this,ChallengeSwitchingActivity.class);
+        gameIntent.putExtra("name",challengeName);
+        gamePi=PendingIntent.getActivity(this,0,gameIntent,0);
     }
 
 }

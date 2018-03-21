@@ -14,12 +14,14 @@ public class JumpScoreActivity extends AppCompatActivity {
     TextView scoreView;
     MyCanvas mycanvas;
     String score;
+    String mode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
         score = intent.getStringExtra(JumpActivity.EXTRA_MESSAGE);
+        mode = intent.getStringExtra("mode");
         setContentView(R.layout.activity_jump_score);
 
         mainButton = (Button)  findViewById(R.id.main);
@@ -50,13 +52,18 @@ public class JumpScoreActivity extends AppCompatActivity {
     }
 
     public void changetoGame( ) {
+
         Intent intent = new Intent(this, JumpActivity.class);
+        intent.putExtra("mode",mode);
         startActivity(intent);
+        this.finish();
+        //JumpScoreActivity.this.finish();
     }
 
     public void changetoMain( ) {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
+        this.finish();
     }
 
 }

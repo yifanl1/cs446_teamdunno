@@ -12,18 +12,20 @@
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity android:name=".setAlarmActivity" />
         <activity android:name=".AlarmRingingActivity" />
-        <activity android:name=".AlarmListActivity"/>
-        <activity android:name=".GameModeActivity"/>
-        <activity android:name=".JumpActivity"/>
-        <activity android:name=".JumpScoreActivity"/>
-
-        <activity android:name=".maze.MazeActivity"
-            android:theme="@style/AppTheme.MazeTheme"/>
+        <activity android:name=".AlarmListActivity" />
+        <activity android:name=".GameModeActivity" />
+        <activity android:name=".JumpActivity" />
+        <activity android:name=".JumpScoreActivity" />
+        <activity
+            android:name=".maze.MazeActivity"
+            android:theme="@style/AppTheme.MazeTheme" />
+        <activity android:name=".ChallengeSwitchingActivity"></activity>
     </application>
 
 </manifest>

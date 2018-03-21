@@ -40,7 +40,7 @@ public class AlarmRingingActivity extends AppCompatActivity {
 
         Random rand=new Random();
 
-        new AlertDialog.Builder(AlarmRingingActivity.this).setTitle("Alarm").setMessage("Get up right now! Do some math to stop the alarm")
+        new AlertDialog.Builder(AlarmRingingActivity.this).setTitle("Alarm").setMessage("Get up right now! Do some math to stop the alarm!")
                 .setPositiveButton("Sure!", new DialogInterface.OnClickListener(){
                     @Override
                     public void onClick(DialogInterface dialog, int which){
@@ -60,7 +60,7 @@ public class AlarmRingingActivity extends AppCompatActivity {
                     correctCount++;
                     if (correctCount==5){
                         new AlertDialog.Builder(AlarmRingingActivity.this).setTitle("Congratulations").setMessage("You've passed the challenge!")
-                                .setPositiveButton("Close Alarm", new DialogInterface.OnClickListener(){
+                                .setPositiveButton("Stop Alarm", new DialogInterface.OnClickListener(){
                                     @Override
                                     public void onClick(DialogInterface dialog, int which){
                                         mediaPlayer.stop();

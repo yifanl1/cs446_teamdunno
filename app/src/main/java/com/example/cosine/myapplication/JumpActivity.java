@@ -15,6 +15,8 @@ import  android.animation.AnimatorSet;
 import android.widget.TextView;
 import android.view.View.OnTouchListener;
 import 	android.view.MotionEvent;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 
 public class JumpActivity extends AppCompatActivity {
 
@@ -22,8 +24,14 @@ public class JumpActivity extends AppCompatActivity {
     public static final String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE";
     boolean lost = false;
     int score;
+    int temp;
+    String mode;
+    Intent intent;
 
     protected void onCreate(Bundle savedInstanceState) {
+        intent=getIntent();
+        mode=intent.getStringExtra("mode");
+
         score = 0;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_jump);
@@ -92,6 +100,13 @@ public class JumpActivity extends AppCompatActivity {
 
                 } else {
                     mycanvas.score += 1;
+
+                    if (mode!=null && mode.equals("alarm")) {
+                        if (mycanvas.score>=1){
+                            JumpActivity.this.finish();
+                        }
+                    }
+
                     mycanvas.newRect();
                 }
             }
@@ -101,9 +116,12 @@ public class JumpActivity extends AppCompatActivity {
 
     public void loseGame( ) {
         score = mycanvas.score;
+
         Intent intent = new Intent(this, JumpScoreActivity.class);
         intent.putExtra(EXTRA_MESSAGE, Integer.toString(score));
+        intent.putExtra("mode",mode);
         startActivity(intent);
+        this.finish();
     }
 
     class MyOnTouchListener implements OnTouchListener {

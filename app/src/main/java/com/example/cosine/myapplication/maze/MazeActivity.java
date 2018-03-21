@@ -27,6 +27,10 @@ public class MazeActivity extends AppCompatActivity implements SensorEventListen
 
     private MazeGrid mazeGrid;
 
+    Intent intent;
+    String mode;
+
+
     public MazeActivity() {
     }
 
@@ -34,6 +38,9 @@ public class MazeActivity extends AppCompatActivity implements SensorEventListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        intent=getIntent();
+        mode=intent.getStringExtra("mode");
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -89,8 +96,12 @@ public class MazeActivity extends AppCompatActivity implements SensorEventListen
     }
 
     private void gameOver() {
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
+        if (mode!=null && mode.equals("alarm")){
+            MazeActivity.this.finish();
+            return;
+        }
+        Intent quitIntent = new Intent(this, MainActivity.class);
+        startActivity(quitIntent);
     }
 
     private class MazeView extends View {

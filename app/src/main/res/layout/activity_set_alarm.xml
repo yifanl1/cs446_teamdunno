@@ -82,7 +82,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="24dp"
         android:layout_marginTop="4dp"
-        android:text="RIngtone: Not Set"
+        android:text="Ringtone: Not Set"
         android:textSize="14sp"
         app:layout_constraintEnd_toStartOf="@+id/change2"
         app:layout_constraintStart_toStartOf="parent"
