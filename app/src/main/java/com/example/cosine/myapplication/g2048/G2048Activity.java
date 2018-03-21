@@ -7,6 +7,8 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.widget.Button;
 import android.widget.TextView;
+import android.content.Context;
+import android.content.Intent;
 
 import com.example.cosine.myapplication.R;
 
@@ -16,6 +18,9 @@ public class G2048Activity extends AppCompatActivity{
     private Board board;
     private TextView swipe;
 
+    String mode;
+    Intent intent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,6 +29,9 @@ public class G2048Activity extends AppCompatActivity{
 
         board = new Board();
         Button blocks[][] = new Button[4][4];
+
+        intent=getIntent();
+        mode=intent.getStringExtra("mode");
 
         blocks[0][0] = (Button) findViewById(R.id.cell00);
         blocks[0][1] = (Button) findViewById(R.id.cell01);
@@ -97,7 +105,12 @@ public class G2048Activity extends AppCompatActivity{
                     board.merge_down();
                 }
 
-
+                int max=board.getMax();
+                if (mode!=null && mode.equals("alarm")){
+                    if (max>17) {
+                        G2048Activity.this.finish();
+                    }
+                }
             } catch (Exception e) {
 
             }

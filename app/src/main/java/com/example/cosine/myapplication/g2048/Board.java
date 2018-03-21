@@ -47,6 +47,18 @@ public class Board {
         return cells[x][y].getNum();
     }
 
+    public int getMax(){
+        int i, j;
+        int ans=0;
+        for (i=0;i<dimension;i++){
+            for (j=0;j<dimension;j++){
+                if (getValue(i,j)>ans){
+                    ans=getValue(i,j);
+                }
+            }
+        }
+        return ans;
+    }
 
     public void merge_right(){
         copyBoard();

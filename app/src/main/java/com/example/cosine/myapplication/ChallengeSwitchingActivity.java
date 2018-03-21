@@ -11,12 +11,14 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.cosine.myapplication.maze.MazeActivity;
+import com.example.cosine.myapplication.g2048.G2048Activity;
 
 public class ChallengeSwitchingActivity extends AppCompatActivity {
     MediaPlayer mediaPlayer;
     Intent intent;
     Intent jumpIntent;
     Intent mazeIntent;
+    Intent g2048Intent;
     String gameName;
     String ifStop;
     Button stop;
@@ -46,6 +48,9 @@ public class ChallengeSwitchingActivity extends AppCompatActivity {
         mazeIntent = new Intent(ChallengeSwitchingActivity.this, MazeActivity.class);
         mazeIntent.putExtra("mode","alarm");
 
+        g2048Intent = new Intent(ChallengeSwitchingActivity.this, G2048Activity.class);
+        g2048Intent.putExtra("mode","alarm");
+
         new AlertDialog.Builder(ChallengeSwitchingActivity.this).setTitle("Alarm").setMessage("Get up right now! Play "+gameName+" to stop the alarm!")
                 .setPositiveButton("Sure!", new DialogInterface.OnClickListener() {
                     @Override
@@ -63,6 +68,9 @@ public class ChallengeSwitchingActivity extends AppCompatActivity {
         }
         if (gameName.equals("Maze")){
             startActivity(mazeIntent);
+        }
+        if (gameName.equals("2048")){
+            startActivity(g2048Intent);
         }
         tv.setText("Congratulations!  You have passed the challenge!");
         stop.setVisibility(View.VISIBLE);
