@@ -25,7 +25,8 @@
         <activity
             android:name=".maze.MazeActivity"
             android:theme="@style/AppTheme.MazeTheme" />
-        <activity android:name=".ChallengeSwitchingActivity"></activity>
+        <activity android:name=".ChallengeSwitchingActivity" />
+        <activity android:name=".g2048.G2048Activity"></activity>
     </application>
 
 </manifest>
