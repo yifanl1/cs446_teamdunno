@@ -1,112 +1,66 @@
 package com.example.cosine.myapplication.g2048;
 
+import com.example.cosine.myapplication.GameState;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class Board {
-    private int dimension = 4;
+    public static final int BOARD_SIZE = 4;
     private Cell cells[][];
-    private Cell backup[][];
-    private Random rn = new Random();
+    private Random rng = new Random();
     private int score = 0;
-    private Display display;
+    private GameState gameState = GameState.ONGOING;
+    private boolean moved = false;
+
+    private boolean scoredMode = false;
+    private int scoreThreshold = 0;
 
     Board(){
-        cells = new Cell[dimension][dimension];
-        backup = new Cell[dimension][dimension];
-        for (int x = 0; x < dimension; ++x){
-            for (int y = 0; y < dimension; ++y){
+        cells = new Cell[BOARD_SIZE][BOARD_SIZE];
+        for (int x = 0; x < BOARD_SIZE; ++x){
+            for (int y = 0; y < BOARD_SIZE; ++y){
                 cells[x][y] = new Cell(x, y);
-                backup[x][y] = new Cell(x, y);
             }
         }
+
+        initializeBoard();
     }
 
-    public void addDisplay(Display display){
-        this.display = display;
-        for (int x = 0; x < 2; ++x){
-            this.gen_block();
+    private void initializeBoard() {
+        for (int i = 0; i < 2; ++i) { // place 2 blocks
+            this.genNewCell();
         }
     }
 
-    public void gen_block(){
-        int num = ran_num();
-        int position = ran_find_empty_block();
-        if ((position == -1) && (All_merge() == false)){
-            //end the game
-        }
-        if (num == 2){
-            cells[position/4][position%4].set2();
-        }
-        else if (num == 4){
-            cells[position/4][position%4].set4();
-        }
-        display.updateDisplay();
+    public void genNewCell(){
+        int index = findRandomClearCell();
+        cells[index/4][index%4].setNum(nextCellNum());
     }
 
-    public int getValue(int x, int y){
+    public int getValueAt(int x, int y){
         return cells[x][y].getNum();
     }
 
-    public int getMax(){
-        int i, j;
-        int ans=0;
-        for (i=0;i<dimension;i++){
-            for (j=0;j<dimension;j++){
-                if (getValue(i,j)>ans){
-                    ans=getValue(i,j);
-                }
+    // returns index of a random empty cell, returns -1 if all cells are full
+    private int findRandomClearCell(){
+        List<Integer> emptyIndices = new ArrayList<>();
+
+        for (int i = 0; i < 16; ++i){
+            if (cells[i/4][i%4].isClear()) {
+                emptyIndices.add(i);
             }
         }
-        return ans;
-    }
-
-    public void merge_right(){
-        copyBoard();
-        R_skip_space();
-        R_merge();
-        R_skip_space();
-        if (changed()) {
-            gen_block();
-            display.updateDisplay();
+        if (emptyIndices.isEmpty()) {
+            return -1;
         }
+        return emptyIndices.get(rng.nextInt(emptyIndices.size()));
     }
 
-    public void merge_left(){
-        copyBoard();
-        L_skip_space();
-        L_merge();
-        L_skip_space();
-        if (changed()) {
-            gen_block();
-            display.updateDisplay();
-        }
-    }
-
-    public void merge_down(){
-        copyBoard();
-        D_skip_space();
-        D_merge();
-        D_skip_space();
-        if (changed()) {
-            gen_block();
-            display.updateDisplay();
-        }
-    }
-
-    public void merge_up(){
-        copyBoard();
-        U_skip_space();
-        U_merge();
-        U_skip_space();
-        if (changed()) {
-            gen_block();
-            display.updateDisplay();
-        }
-    }
-
-    private int ran_num(){
-        int num = rn.nextInt(32) + 1;
-        if (num % 4 == 0) {
+    private int nextCellNum(){
+        int num = rng.nextInt(4);
+        if (num == 0) { // 1 in 4 chance to spawn a 4 block
             return 4;
         }
         else {
@@ -114,175 +68,153 @@ public class Board {
         }
     }
 
-    private int ran_find_empty_block (){
-        int start_block = 0;
-        start_block = rn.nextInt(16) ;
+    public void makeMove(Direction dir) {
+        moved = false;
+        rotate(dir.rightRotationsTo(Direction.RIGHT)); // rotate
+        slide();
+        merge();
+        slide();
+        rotate(4 - dir.rightRotationsTo(Direction.RIGHT)); // rotate back
 
-        for (int i = 0; i < 50; ++i){
-            start_block = rn.nextInt(16) ;
-            if (cells[start_block/4][start_block%4].getNum() == 0 ) return start_block;
+        if (moved) {
+            genNewCell();
         }
-
-        for (int i = start_block; i < 16; ++i){
-            if (cells[start_block/4][start_block%4].getNum() == 0) return i;
+        if ((scoredMode && score > scoreThreshold) || onBoard(2048)) {
+            gameState = GameState.WON;
+        } else if (!canMove()) {
+            gameState = GameState.LOST;
         }
-        for (int i = 0; i < start_block; ++i){
-            if (cells[start_block/4][start_block%4].getNum() == 0) return i;
-        }
-        return -1;
     }
 
-    private void R_skip_space(){
-        for (int x = 0; x < dimension; ++x){
-            for (int z = 1; z < dimension; ++z){
-                for (int y = dimension - 1; y > 0; --y){
-                    if (cells[x][y].getNum() == 0) {
-                        cells[x][y].setNum(cells[x][y-1]);
-                        cells[x][y-1].clearCell();
+    // handle only right direction, rotating the g2048_board as necessary
+    private void slide() {
+        for (int x = 0; x < BOARD_SIZE; ++x){
+            for (int z = 1; z < BOARD_SIZE; ++z) { // repeat for each cell of the row
+                for (int y = BOARD_SIZE - 1; y > 0; --y){
+                    if (cells[x][y - 1].getNum() != 0 && cells[x][y].getNum() == 0) {
+                        cells[x][y].copyNum(cells[x][y - 1]);
+                        cells[x][y - 1].setNum(0);
+                        moved = true;
                     }
                 }
             }
         }
     }
 
-    private void R_merge(){
-        for (int x = 0; x < dimension; ++x){
-            for (int y = dimension - 1; y > 0; --y){
+    private void merge() {
+        for (int x = 0; x < BOARD_SIZE; ++x){
+            for (int y = BOARD_SIZE - 1; y > 0; --y){
                 if (cells[x][y].getNum() == cells[x][y-1].getNum()){
                     cells[x][y].doubleNum();
                     score = score + cells[x][y].getNum();
-                    cells[x][y-1].clearCell();
+                    cells[x][y-1].setNum(0);
+                    moved = true;
                 }
             }
         }
     }
 
-
-    private void L_skip_space(){
-        for (int x = 0; x < dimension; ++x){
-            for (int z = 1; z < dimension; ++z){
-                for (int y = 0; y < dimension - 1; ++y){
-                    if (cells[x][y].getNum() == 0) {
-                        cells[x][y].setNum(cells[x][y+1]);
-                        cells[x][y+1].clearCell();
-                    }
+    private boolean boardFull() {
+        for (Cell[] row: cells) {
+            for (Cell cell: row) {
+                if (cell.isClear()) {
+                    return false;
                 }
             }
         }
+        return true;
     }
 
-    private void L_merge(){
-        for (int x = 0; x < dimension; ++x){
-            for (int y = 0; y < dimension - 1; ++y){
-                if (cells[x][y].getNum() == cells[x][y+1].getNum()){
-                    cells[x][y].doubleNum();
-                    score = score + cells[x][y].getNum();
-                    cells[x][y+1].clearCell();
-                }
-            }
+    private boolean canMove(){
+        if (!boardFull()) {
+            return true;
         }
-    }
-
-    private void U_skip_space(){
-        for (int y = 0; y < dimension; ++y){
-            for (int z = 1; z < dimension; ++z){
-                for (int x = 0; x < dimension - 1; ++x){
-                    if (cells[x][y].getNum() == 0) {
-                        cells[x][y].setNum(cells[x+1][y]);
-                        cells[x+1][y].clearCell();
-                    }
-                }
-            }
-        }
-    }
-
-    private void U_merge(){
-        for (int y = 0; y < dimension; ++y){
-            for (int x = 0; x < dimension - 1; ++x){
-                if (cells[x][y].getNum() == cells[x+1][y].getNum()){
-                    cells[x][y].doubleNum();
-                    score = score + cells[x][y].getNum();
-                    cells[x+1][y].clearCell();
-                }
-            }
-        }
-    }
-
-    private void D_skip_space(){
-        for (int y = 0; y < dimension; ++y){
-            for (int z = 1; z < dimension; ++z){
-                for (int x = dimension - 1; x > 0;  --x){
-                    if (cells[x][y].getNum() == 0) {
-                        cells[x][y].setNum(cells[x-1][y]);
-                        cells[x-1][y].clearCell();
-                    }
-                }
-            }
-        }
-    }
-
-    private void D_merge(){
-        for (int y = 0; y < dimension; ++y){
-            for (int x = dimension - 1; x > 0; --x){
-                if (cells[x][y].getNum() == cells[x-1][y].getNum()){
-                    cells[x][y].doubleNum();
-                    score = score + cells[x][y].getNum();
-                    cells[x-1][y].clearCell();
-                }
-            }
-        }
-    }
-
-    private boolean All_merge(){
-        for (int x = 0; x < dimension; ++x){                //Right
-            for (int y = dimension - 1; y > 0; --y){
-                if (cells[x][y].getNum() == cells[x][y-1].getNum()){
-                    return true;
-                }
-            }
-        }
-
-        for (int x = 0; x < dimension; ++x){
-            for (int y = dimension - 1; y > 0; --y){        //left
-                if (cells[x][y].getNum() == cells[x][y+1].getNum()){
-                    return true;
-                }
-            }
-        }
-
-        for (int y = 0; y < dimension; ++y){
-            for (int x = 0; x < dimension - 1; ++x){        //up
-                if (cells[x][y].getNum() == cells[x+1][y].getNum()){
-                    return true;
-                }
-            }
-        }
-
-        for (int y = 0; y < dimension; ++y){
-            for (int x = 0; x < dimension - 1; ++x){        //Down
-                if (cells[x][y].getNum() == cells[x-1][y].getNum()){
+        for (int i = 0; i < BOARD_SIZE; ++i){
+            for (int j = 0; j < BOARD_SIZE; ++j){
+                int currNum = cells[i][j].getNum();
+                if (((i > 0) && (currNum == cells[i - 1][j].getNum())) ||
+                    ((i < BOARD_SIZE - 1) && (currNum == cells[i + 1][j].getNum())) ||
+                    ((j > 0) && (currNum == cells[i][j - 1].getNum())) ||
+                    ((j < BOARD_SIZE - 1) && (currNum == cells[i][j + 1].getNum()))) {
                     return true;
                 }
             }
         }
         return false;
     }
-    private void copyBoard(){
-        for (int x = 0; x < dimension; ++x){
-            for (int y = 0; y < dimension; ++y){
-                backup[x][y].setNum(cells[x][y]);
-            }
-        }
-    }
 
-    private boolean changed(){
-        for (int x = 0; x < dimension; ++x) {
-            for (int y = 0; y < dimension; ++y) {
-                if (backup[x][y].getNum() != cells[x][y].getNum()){
+    private boolean onBoard(int n) {
+        for (Cell[] row: cells) {
+            for (Cell cell: row) {
+                if (cell.getNum() == n) {
                     return true;
                 }
             }
         }
         return false;
+    }
+
+    // rotates the g2048_board 90 degrees right n times
+    private void rotate(int n) {
+        switch(n % 4) {
+            case 0:
+                break;
+            case 1:
+                reverseRows();
+                transpose();
+                break;
+            case 2:
+                reverseCols();
+                reverseRows();
+                break;
+            case 3:
+                transpose();
+                reverseRows();
+                break;
+        }
+    }
+
+    // utility function, transposes cells
+    private void transpose() {
+        for (int i = 0; i < BOARD_SIZE; ++i) {
+            for (int j = i; j < BOARD_SIZE; ++j) {
+                Cell c = cells[i][j];
+                cells[i][j] = cells[j][i];
+                cells[j][i] = c;
+            }
+        }
+    }
+
+    // flips the g2048_board vertically
+    private void reverseRows() {
+        for (int i = 0, j = BOARD_SIZE - 1; i < j; ++i, --j) {
+            Cell[] row = cells[i];
+            cells[i] = cells[j];
+            cells[j] = row;
+        }
+    }
+
+    // flips the g2048_board horizontally
+    private void reverseCols() {
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            for (int j = 0, k = BOARD_SIZE - 1; j < k; ++j, --k) {
+                Cell c = cells[i][j];
+                cells[i][j] = cells[i][k];
+                cells[i][k] = c;
+            }
+        }
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public GameState getGameState() {
+        return gameState;
+    }
+
+    public void setScoredMode(int scoreThreshold) {
+        scoredMode = true;
+        this.scoreThreshold = scoreThreshold;
     }
 }

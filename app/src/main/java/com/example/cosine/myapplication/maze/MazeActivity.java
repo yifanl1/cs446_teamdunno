@@ -109,10 +109,10 @@ public class MazeActivity extends AppCompatActivity implements SensorEventListen
 
         public MazeView(Context context) {
             super(context);
-            Bitmap ballSrc = BitmapFactory.decodeResource(getResources(), R.drawable.ball);
-            Bitmap hWallSrc = BitmapFactory.decodeResource(getResources(), R.drawable.wall_h);
-            Bitmap vWallSrc = BitmapFactory.decodeResource(getResources(), R.drawable.wall_v);
-            Bitmap goalSrc = BitmapFactory.decodeResource(getResources(), R.drawable.goal);
+            Bitmap ballSrc = BitmapFactory.decodeResource(getResources(), R.drawable.maze_ball);
+            Bitmap hWallSrc = BitmapFactory.decodeResource(getResources(), R.drawable.maze_wall_h);
+            Bitmap vWallSrc = BitmapFactory.decodeResource(getResources(), R.drawable.maze_wall_v);
+            Bitmap goalSrc = BitmapFactory.decodeResource(getResources(), R.drawable.maze_goal);
 
             int ballSize = (int)mazeGrid.getBallSize();
             int cellSize = (int)mazeGrid.getCellSize();

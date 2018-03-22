@@ -5,11 +5,12 @@ import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.content.Context;
 import android.content.Intent;
 
+import com.example.cosine.myapplication.GameState;
 import com.example.cosine.myapplication.R;
 
 
@@ -17,9 +18,11 @@ public class G2048Activity extends AppCompatActivity{
     private GestureDetectorCompat mDetector;
     private Board board;
     private TextView swipe;
+    private Display display;
 
     String mode;
     Intent intent;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,35 +31,53 @@ public class G2048Activity extends AppCompatActivity{
         mDetector = new GestureDetectorCompat(this,new MyGestureListener());
 
         board = new Board();
-        Button blocks[][] = new Button[4][4];
+        Button buttons[][] = new Button[4][4];
 
-        intent=getIntent();
-        mode=intent.getStringExtra("mode");
+        buttons[0][0] = (Button) findViewById(R.id.cell00);
+        buttons[0][1] = (Button) findViewById(R.id.cell01);
+        buttons[0][2] = (Button) findViewById(R.id.cell02);
+        buttons[0][3] = (Button) findViewById(R.id.cell03);
 
-        blocks[0][0] = (Button) findViewById(R.id.cell00);
-        blocks[0][1] = (Button) findViewById(R.id.cell01);
-        blocks[0][2] = (Button) findViewById(R.id.cell02);
-        blocks[0][3] = (Button) findViewById(R.id.cell03);
+        buttons[1][0] = (Button) findViewById(R.id.cell10);
+        buttons[1][1] = (Button) findViewById(R.id.cell11);
+        buttons[1][2] = (Button) findViewById(R.id.cell12);
+        buttons[1][3] = (Button) findViewById(R.id.cell13);
 
-        blocks[1][0] = (Button) findViewById(R.id.cell10);
-        blocks[1][1] = (Button) findViewById(R.id.cell11);
-        blocks[1][2] = (Button) findViewById(R.id.cell12);
-        blocks[1][3] = (Button) findViewById(R.id.cell13);
+        buttons[2][0] = (Button) findViewById(R.id.cell20);
+        buttons[2][1] = (Button) findViewById(R.id.cell21);
+        buttons[2][2] = (Button) findViewById(R.id.cell22);
+        buttons[2][3] = (Button) findViewById(R.id.cell23);
 
-        blocks[2][0] = (Button) findViewById(R.id.cell20);
-        blocks[2][1] = (Button) findViewById(R.id.cell21);
-        blocks[2][2] = (Button) findViewById(R.id.cell22);
-        blocks[2][3] = (Button) findViewById(R.id.cell23);
+        buttons[3][0] = (Button) findViewById(R.id.cell30);
+        buttons[3][1] = (Button) findViewById(R.id.cell31);
+        buttons[3][2] = (Button) findViewById(R.id.cell32);
+        buttons[3][3] = (Button) findViewById(R.id.cell33);
 
-        blocks[3][0] = (Button) findViewById(R.id.cell30);
-        blocks[3][1] = (Button) findViewById(R.id.cell31);
-        blocks[3][2] = (Button) findViewById(R.id.cell32);
-        blocks[3][3] = (Button) findViewById(R.id.cell33);
+        setButtonPassThrough(buttons);
 
         swipe = (TextView) findViewById(R.id.textView);
 
+        display = new Display(this, buttons);
+        display.setBoard(board);
+        display.updateDisplay();
 
-        Display display = new Display(this, board, blocks);
+        if (mode != null && mode.equals("alarm")){
+            board.setScoredMode(100);
+        }
+    }
+
+    private void setButtonPassThrough(Button[][] buttons) {
+        for (Button[] row: buttons) {
+            for (Button button: row) {
+                button.setClickable(false);
+                button.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View view, MotionEvent motionEvent) {
+                        return false;
+                    }
+                });
+            }
+        }
     }
 
     @Override
@@ -68,48 +89,45 @@ public class G2048Activity extends AppCompatActivity{
     class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
         private static final String DEBUG_TAG = "Gestures";
 
-
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            int SWIPE_MIN_DISTANCE = 80;
-            int SWIPE_THRESHOLD_VELOCITY = 100;
+            final float SWIPE_MIN_DISTANCE = 80f;
+            final float SWIPE_THRESHOLD_VELOCITY = 100f;
 
             try {
+                float dx = e1.getX() - e2.getX();
+                float dy = e1.getY() - e2.getY();
+                Direction moveDir = null;
 
-                // right to left swipe
-                if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE
-                        && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                    swipe.setText("Left");
-                    System.out.println("LEFT");
-                    board.merge_left();
-                }
-                // left to right swipe
-                else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE
-                        && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                    swipe.setText("Right");
-                    System.out.println("RIGHT");
-                    board.merge_right();
-                }
-
-                else if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE
-                        && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
-                    swipe.setText("Up");
-                    System.out.println("UP");
-                    board.merge_up();
-                }
-
-                else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE
-                        && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
-                    swipe.setText("Down");
-                    System.out.println("DOWN");
-                    board.merge_down();
-                }
-
-                int max=board.getMax();
-                if (mode!=null && mode.equals("alarm")){
-                    if (max>17) {
-                        G2048Activity.this.finish();
+                if (Math.abs(dx) >= Math.abs(dy) && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                    if (dx > SWIPE_MIN_DISTANCE) {
+                        swipe.setText("Left");
+                        moveDir = Direction.LEFT;
+                    } else if (-1 * dx > SWIPE_MIN_DISTANCE) {
+                        swipe.setText("Right");
+                        moveDir = Direction.RIGHT;
                     }
+                } else if (Math.abs(dy) > Math.abs(dx) && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
+                    if (dy > SWIPE_MIN_DISTANCE) {
+                        swipe.setText("Up");
+                        moveDir = Direction.UP;
+                    } else if (-1 * dy > SWIPE_MIN_DISTANCE) {
+                        swipe.setText("Down");
+                        moveDir = Direction.DOWN;
+                    }
+                }
+
+                if (moveDir != null) {
+                    board.makeMove(moveDir);
+                    display.updateDisplay();
+
+                    if (board.getGameState() == GameState.WON) {
+                        System.out.println("finished");
+                        G2048Activity.this.finish();
+                    } else if (board.getGameState() == GameState.LOST) {
+                        swipe.setText("You Lose!");
+                    }
+                    return true;
                 }
             } catch (Exception e) {
 

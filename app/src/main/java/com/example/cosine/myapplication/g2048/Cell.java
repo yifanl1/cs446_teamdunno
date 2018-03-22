@@ -23,13 +23,13 @@ public class Cell {
         return y;
     }
 
-    public void setNum(Cell cell) { num = cell.getNum(); }
+    public void copyNum(Cell cell) { num = cell.getNum(); }
 
-    public void set2(){ num = 2; }
-
-    public void set4(){ num = 4; }
+    public void setNum(int n){ num = n; }
 
     public void doubleNum() { num *= 2; }
 
-    public void clearCell() { num = 0; }
+    public boolean isClear() {
+        return num == 0;
+    }
 }
