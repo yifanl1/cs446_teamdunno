@@ -105,6 +105,7 @@ public class Board {
                 if (cells[x][y].getNum() == cells[x][y-1].getNum()){
                     cells[x][y].doubleNum();
                     score = score + cells[x][y].getNum();
+                    System.out.println(score);
                     cells[x][y-1].setNum(0);
                     moved = true;
                 }

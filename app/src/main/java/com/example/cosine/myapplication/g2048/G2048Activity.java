@@ -55,7 +55,7 @@ public class G2048Activity extends AppCompatActivity{
 
         setButtonPassThrough(buttons);
 
-        swipe = (TextView) findViewById(R.id.textView);
+        swipe = (TextView) findViewById(R.id.scoreView);
 
         display = new Display(this, buttons);
         display.setBoard(board);
@@ -113,11 +113,11 @@ public class G2048Activity extends AppCompatActivity{
                     }
                 }
 
-                swipe.setText("Score: "+ Integer.toString(board.getScore()));
 
                 if (moveDir != null) {
                     board.makeMove(moveDir);
                     display.updateDisplay();
+                    swipe.setText("Score: "+ Integer.toString(board.getScore()));
 
                     if (board.getGameState() == GameState.WON) {
                         System.out.println("finished");
