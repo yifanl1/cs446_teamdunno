@@ -30,6 +30,13 @@ public class G2048Activity extends AppCompatActivity{
         setContentView(R.layout.activity_g2048);
         mDetector = new GestureDetectorCompat(this,new MyGestureListener());
 
+        // handle getting operation mode
+        Intent intent = getIntent();
+        Bundle extras = intent.getExtras();
+        if (extras != null) {
+            mode = extras.getString("mode");
+        }
+
         board = new Board();
         Button buttons[][] = new Button[4][4];
 
@@ -61,7 +68,7 @@ public class G2048Activity extends AppCompatActivity{
         display.setBoard(board);
         display.updateDisplay();
 
-        if (mode != null && mode.equals("alarm")){
+        if (mode != null && mode.equals("alarm")) {
             board.setScoredMode(100);
         }
     }

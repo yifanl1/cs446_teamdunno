@@ -1,5 +1,9 @@
 package com.example.cosine.myapplication.maze;
 
+import android.view.View;
+
+import com.example.cosine.myapplication.GameState;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,6 +28,8 @@ class MazeGrid {
     private float xBound;
     private float yBound;
 
+    private GameState gameState;
+
     MazeGrid(float xBound, float yBound) {
         float bound = Math.min(xBound, yBound);
         ballSize = bound / BALL_RATIO;
@@ -34,6 +40,8 @@ class MazeGrid {
 
         this.xBound = xBound - ballSize;
         this.yBound = yBound - ballSize;
+
+        gameState = GameState.ONGOING;
         generateMaze();
     }
 
@@ -137,10 +145,14 @@ class MazeGrid {
     void update(float ddx, float ddy) {
         ball.update(ddx, ddy);
         ball.checkCollisions(cells, xBound, yBound);
+
+        if (goalCell.contains(ball)) {
+            gameState = GameState.WON;
+        }
     }
 
-    boolean checkWin() {
-        return goalCell.contains(ball);
+    GameState getGameState() {
+        return gameState;
     }
 
     List<MazeCell> getCells() {
