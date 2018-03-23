@@ -40,7 +40,7 @@ public class Display extends TableLayout {
                     buttons[x][y].setText("");
                 } else{
                     buttons[x][y].setTextSize(chooseTextSize(num));
-                    buttons[x][y].setText(String.format(Locale.getDefault(), "%d", num));
+                    buttons[x][y].setText(Integer.toString(num));
                 }
 
                 buttons[x][y].setBackground(chooseBackground(num));

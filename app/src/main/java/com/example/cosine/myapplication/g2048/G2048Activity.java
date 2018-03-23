@@ -101,21 +101,19 @@ public class G2048Activity extends AppCompatActivity{
 
                 if (Math.abs(dx) >= Math.abs(dy) && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
                     if (dx > SWIPE_MIN_DISTANCE) {
-                        swipe.setText("Left");
                         moveDir = Direction.LEFT;
                     } else if (-1 * dx > SWIPE_MIN_DISTANCE) {
-                        swipe.setText("Right");
                         moveDir = Direction.RIGHT;
                     }
                 } else if (Math.abs(dy) > Math.abs(dx) && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
                     if (dy > SWIPE_MIN_DISTANCE) {
-                        swipe.setText("Up");
                         moveDir = Direction.UP;
                     } else if (-1 * dy > SWIPE_MIN_DISTANCE) {
-                        swipe.setText("Down");
                         moveDir = Direction.DOWN;
                     }
                 }
+
+                swipe.setText("Score: "+ Integer.toString(board.getScore()));
 
                 if (moveDir != null) {
                     board.makeMove(moveDir);

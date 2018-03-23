@@ -118,6 +118,8 @@ public class MazeActivity extends AppCompatActivity implements SensorEventListen
             int cellSize = (int)mazeGrid.getCellSize();
             int wallThickness = (int)mazeGrid.getWallThickness();
 
+            this.setBackgroundResource(R.drawable.maze_background);
+
             ball = Bitmap.createScaledBitmap(ballSrc, ballSize, ballSize, true);
             hWall = Bitmap.createScaledBitmap(hWallSrc, cellSize + wallThickness, wallThickness, true);
             vWall = Bitmap.createScaledBitmap(vWallSrc, wallThickness, cellSize + wallThickness, true);
