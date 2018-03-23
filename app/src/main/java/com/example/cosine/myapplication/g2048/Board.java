@@ -1,7 +1,5 @@
 package com.example.cosine.myapplication.g2048;
-
 import com.example.cosine.myapplication.GameState;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
