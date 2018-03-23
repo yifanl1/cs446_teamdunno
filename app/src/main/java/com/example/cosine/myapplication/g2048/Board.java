@@ -76,6 +76,7 @@ public class Board {
 
         if (moved) {
             genNewCell();
+            moved = false;
         }
         if ((scoredMode && score > scoreThreshold) || onBoard(2048)) {
             gameState = GameState.WON;
@@ -102,10 +103,9 @@ public class Board {
     private void merge() {
         for (int x = 0; x < BOARD_SIZE; ++x){
             for (int y = BOARD_SIZE - 1; y > 0; --y){
-                if (cells[x][y].getNum() == cells[x][y-1].getNum()){
+                if (cells[x][y].getNum() == cells[x][y-1].getNum() && cells[x][y].getNum() != 0){
                     cells[x][y].doubleNum();
                     score = score + cells[x][y].getNum();
-                    System.out.println(score);
                     cells[x][y-1].setNum(0);
                     moved = true;
                 }
