@@ -28,8 +28,6 @@ public class G2048Activity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_g2048);
-        intent = getIntent();
-        mode = intent.getStringExtra("mode");
         mDetector = new GestureDetectorCompat(this,new MyGestureListener());
 
         // handle getting operation mode
