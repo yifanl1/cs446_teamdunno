@@ -16,9 +16,8 @@ import com.example.cosine.myapplication.g2048.G2048Activity;
 public class ChallengeSwitchingActivity extends AppCompatActivity {
     MediaPlayer mediaPlayer;
     Intent intent;
-    Intent jumpIntent;
-    Intent mazeIntent;
-    Intent g2048Intent;
+
+    Intent challengeIntent;
     String gameName;
     String ifStop;
     Button stop;
@@ -42,14 +41,26 @@ public class ChallengeSwitchingActivity extends AppCompatActivity {
         gameName = intent.getStringExtra("name");
         tv.setText("gameName="+gameName+";");
 
-        jumpIntent = new Intent(ChallengeSwitchingActivity.this, JumpActivity.class);
-        jumpIntent.putExtra("mode","alarm");
 
-        mazeIntent = new Intent(ChallengeSwitchingActivity.this, MazeActivity.class);
-        mazeIntent.putExtra("mode","alarm");
-
-        g2048Intent = new Intent(ChallengeSwitchingActivity.this, G2048Activity.class);
-        g2048Intent.putExtra("mode","alarm");
+        Class challengeClass = null;
+        switch(gameName) {
+            case "Jump":
+                challengeClass = JumpActivity.class;
+                break;
+            case "Maze":
+                challengeClass = MazeActivity.class;
+                break;
+            case "2048":
+                challengeClass = G2048Activity.class;
+                break;
+            default:
+                challengeIntent = null;
+                break;
+        }
+        if (challengeClass != null) {
+            challengeIntent = new Intent(ChallengeSwitchingActivity.this, challengeClass);
+            challengeIntent.putExtra("mode", "alarm");
+        }
 
         new AlertDialog.Builder(ChallengeSwitchingActivity.this).setTitle("Alarm").setMessage("Get up right now! Play "+gameName+" to stop the alarm!")
                 .setPositiveButton("Sure!", new DialogInterface.OnClickListener() {
@@ -63,15 +74,10 @@ public class ChallengeSwitchingActivity extends AppCompatActivity {
     }
 
     public void goToGame(){
-        if (gameName.equals("Jump")){
-            startActivity(jumpIntent);
+        if (challengeIntent == null) {
+            return;
         }
-        if (gameName.equals("Maze")){
-            startActivity(mazeIntent);
-        }
-        if (gameName.equals("2048")){
-            startActivity(g2048Intent);
-        }
+        startActivity(challengeIntent);
         tv.setText("Congratulations!  You have passed the challenge!");
         stop.setVisibility(View.VISIBLE);
         stop.setOnClickListener(new View.OnClickListener(){

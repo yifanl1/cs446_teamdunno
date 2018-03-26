@@ -3,9 +3,6 @@ package com.example.cosine.myapplication.maze;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Point;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -15,20 +12,17 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Display;
-import android.view.View;
 
-import com.example.cosine.myapplication.R;
+import com.example.cosine.myapplication.GameState;
 import com.example.cosine.myapplication.MainActivity;
 
 public class MazeActivity extends AppCompatActivity implements SensorEventListener {
+    private String mode = null;
+
     private SensorManager sensorManager;
     private Sensor accelerometer;
-    private CountDownTimer mazeTimer;
-
     private MazeGrid mazeGrid;
-
-    Intent intent;
-    String mode;
+    private CountDownTimer mazeTimer;
 
 
     public MazeActivity() {
@@ -39,8 +33,12 @@ public class MazeActivity extends AppCompatActivity implements SensorEventListen
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        intent=getIntent();
-        mode=intent.getStringExtra("mode");
+        // handle getting operation mode
+        Intent intent = getIntent();
+        Bundle extras = intent.getExtras();
+        if (extras != null) {
+            mode = extras.getString("mode");
+        }
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -57,12 +55,14 @@ public class MazeActivity extends AppCompatActivity implements SensorEventListen
 
             @Override
             public void onFinish() {
-                gameOver();
+                finishActivity();
             }
         };
 
-        MazeView ballView = new MazeView(this);
-        setContentView(ballView);
+        MazeView mazeView = new MazeView(this);
+        mazeView.setMaze(mazeGrid);
+
+        this.setContentView(mazeView);
     }
 
     @Override
@@ -85,8 +85,8 @@ public class MazeActivity extends AppCompatActivity implements SensorEventListen
             float ddx = sensorEvent.values[0];
             float ddy = -sensorEvent.values[1];
             mazeGrid.update(ddx, ddy);
-            if (mazeGrid.checkWin()) {
-                gameOver();
+            if (mazeGrid.getGameState() == GameState.WON) {
+                finishActivity();
             }
         }
     }
@@ -95,59 +95,12 @@ public class MazeActivity extends AppCompatActivity implements SensorEventListen
     public void onAccuracyChanged(Sensor sensor, int i) {
     }
 
-    private void gameOver() {
-        if (mode!=null && mode.equals("alarm")){
+    private void finishActivity() {
+        if (mode != null && mode.equals("alarm")){
             MazeActivity.this.finish();
             return;
         }
         Intent quitIntent = new Intent(this, MainActivity.class);
         startActivity(quitIntent);
-    }
-
-    private class MazeView extends View {
-        private Bitmap ball, hWall, vWall, goal;
-
-        public MazeView(Context context) {
-            super(context);
-            Bitmap ballSrc = BitmapFactory.decodeResource(getResources(), R.drawable.maze_ball);
-            Bitmap hWallSrc = BitmapFactory.decodeResource(getResources(), R.drawable.maze_wall_h);
-            Bitmap vWallSrc = BitmapFactory.decodeResource(getResources(), R.drawable.maze_wall_v);
-            Bitmap goalSrc = BitmapFactory.decodeResource(getResources(), R.drawable.maze_goal);
-
-            int ballSize = (int)mazeGrid.getBallSize();
-            int cellSize = (int)mazeGrid.getCellSize();
-            int wallThickness = (int)mazeGrid.getWallThickness();
-
-            this.setBackgroundResource(R.drawable.maze_background);
-
-            ball = Bitmap.createScaledBitmap(ballSrc, ballSize, ballSize, true);
-            hWall = Bitmap.createScaledBitmap(hWallSrc, cellSize + wallThickness, wallThickness, true);
-            vWall = Bitmap.createScaledBitmap(vWallSrc, wallThickness, cellSize + wallThickness, true);
-            goal = Bitmap.createScaledBitmap(goalSrc, cellSize, cellSize, true);
-        }
-
-        @Override
-        protected void onDraw(Canvas canvas) {
-            Ball b = mazeGrid.getBall();
-            drawMaze(canvas);
-            canvas.drawBitmap(ball, b.getX(), b.getY(), null);
-            invalidate();
-        }
-
-        private void drawMaze(Canvas canvas) {
-            for (MazeCell cell: mazeGrid.getCells()) {
-                float cellX = cell.getX();
-                float cellY = cell.getY();
-                if (cell.isGoalCell()) {
-                    canvas.drawBitmap(goal, cellX, cellY, null);
-                }
-                if (cell.hasNorthWall()) {
-                    canvas.drawBitmap(hWall, cellX, cellY, null);
-                }
-                if (cell.hasWestWall()) {
-                    canvas.drawBitmap(vWall, cellX, cellY, null);
-                }
-            }
-        }
     }
 }
