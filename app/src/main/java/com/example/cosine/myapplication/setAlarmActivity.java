@@ -38,6 +38,7 @@ public class setAlarmActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_alarm);
+        this.setTitle("Set Alarm");
 
         timePicker=(TimePicker)findViewById(R.id.timePicker);
         alarmManager=(AlarmManager)getSystemService(ALARM_SERVICE);
