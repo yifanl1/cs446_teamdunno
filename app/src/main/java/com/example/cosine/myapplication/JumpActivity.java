@@ -31,7 +31,7 @@ public class JumpActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         intent=getIntent();
         mode=intent.getStringExtra("mode");
-
+        this.setTitle("Jump");
         score = 0;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_jump);

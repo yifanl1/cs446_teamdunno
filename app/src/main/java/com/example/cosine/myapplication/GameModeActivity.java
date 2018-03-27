@@ -19,7 +19,7 @@ public class GameModeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_mode);
-
+        this.setTitle("Games");
         jumpButton=(Button)findViewById(R.id.jump);
         jumpButton.setOnClickListener(new View.OnClickListener(){
            @Override
