@@ -12,11 +12,14 @@ import android.widget.FrameLayout;
 import java.util.Random;
 import android.animation.ObjectAnimator;
 import  android.animation.AnimatorSet;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.view.View.OnTouchListener;
 import 	android.view.MotionEvent;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class JumpActivity extends AppCompatActivity {
 
@@ -24,6 +27,8 @@ public class JumpActivity extends AppCompatActivity {
     public static final String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE";
     boolean lost = false;
     int score;
+    ProgressBar pb;
+    Timer timer;
     int temp;
     String mode;
     Intent intent;
@@ -36,6 +41,7 @@ public class JumpActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_jump);
         mycanvas = (MyCanvas) findViewById(R.id.paint_board);
+        pb =(ProgressBar) findViewById(R.id.progressBar);
         mycanvas.initialGame();
         /*mycanvas.setOnClickListener(new View.OnClickListener()
         {
@@ -135,7 +141,17 @@ public class JumpActivity extends AppCompatActivity {
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
 
-                    time = System.currentTimeMillis()/1000;;
+                    time = System.currentTimeMillis()/1000;
+                    timer = new Timer(true);
+
+                    TimerTask task = new TimerTask() {
+                        public void run() {
+                            if (pb.getProgress() + 1 <= pb.getMax()) {
+                                pb.setProgress(pb.getProgress() + 1);
+                            }
+                        }
+                    };
+                    timer.schedule(task, 0, 30);
 
                     System.out.println("press");
 
@@ -145,10 +161,10 @@ public class JumpActivity extends AppCompatActivity {
                     System.out.println("move");
                     break;
                 case MotionEvent.ACTION_UP:
-
+                    timer.cancel();
+                    pb.setProgress(5);
                     long curtime = System.currentTimeMillis()/1000;
                     long period = curtime - time;
-                    //time = 0;
                     period=period*4;
                     jump(period);
 

@@ -10,6 +10,7 @@ import android.content.*;
 import android.app.*;
 
 import java.util.*;
+import java.io.*;
 
 public class setAlarmActivity extends AppCompatActivity {
 
@@ -32,13 +33,23 @@ public class setAlarmActivity extends AppCompatActivity {
     String weekDays[];
     String games[];
     String challengeName;
+    String ringToneName;
     String sampleSongList[];
+    String shour;
+    String sminute;
+    String rpts;
+
+    String fileName="alarmList";
+    FileOutputStream ostream;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_alarm);
-        this.setTitle("Set Alarm");
+
+        rpts="Repeat: Never";
+        challengeName="Math";
+        ringToneName="default";
 
         timePicker=(TimePicker)findViewById(R.id.timePicker);
         alarmManager=(AlarmManager)getSystemService(ALARM_SERVICE);
@@ -65,13 +76,13 @@ public class setAlarmActivity extends AppCompatActivity {
                 c.setTimeInMillis(System.currentTimeMillis());
                 long currentTime=c.getTimeInMillis();
 
-                String shour=Integer.toString(hour);
+                shour=Integer.toString(hour);
 
                 if (hour<10){
                     shour="0"+shour;
                 }
 
-                String sminute=Integer.toString(minute);
+                sminute=Integer.toString(minute);
 
                 if (minute<10) {
                     sminute = "0" + sminute;
@@ -98,6 +109,7 @@ public class setAlarmActivity extends AppCompatActivity {
 
 
                 Toast.makeText(setAlarmActivity.this,"Alarm is set to "+shour+":"+sminute,Toast.LENGTH_SHORT).show();
+                writeToFile();
                 changetoMain();
             }
         });
@@ -110,16 +122,16 @@ public class setAlarmActivity extends AppCompatActivity {
                 daysChecked=repeatWKDs;
                 AlertDialog ad=new AlertDialog.Builder(setAlarmActivity.this).setTitle("Repeat").setMultiChoiceItems(
                         weekDays,daysChecked,
-                            new AlertDialog.OnMultiChoiceClickListener(){
-                                @Override
-                                public void onClick(DialogInterface di, int which, boolean isChecked){
-                                    if (isChecked){
-                                        daysChecked[which]=true;
-                                    } else {
-                                        daysChecked[which]=false;
-                                    }
+                        new AlertDialog.OnMultiChoiceClickListener(){
+                            @Override
+                            public void onClick(DialogInterface di, int which, boolean isChecked){
+                                if (isChecked){
+                                    daysChecked[which]=true;
+                                } else {
+                                    daysChecked[which]=false;
                                 }
-                            })
+                            }
+                        })
                         .setPositiveButton("OK", new DialogInterface.OnClickListener(){
                             @Override
                             public void onClick(DialogInterface dialog, int id){
@@ -168,7 +180,7 @@ public class setAlarmActivity extends AppCompatActivity {
                                         repeatInfo.setText(s);
                                     }
                                 }
-
+                                rpts=s;
                             }
                         })
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
@@ -182,33 +194,34 @@ public class setAlarmActivity extends AppCompatActivity {
 
         changeButton2=(Button)findViewById(R.id.change2);
         changeButton2.setOnClickListener(new View.OnClickListener(){
-           @Override
-           public void onClick(View v){
-               AlertDialog ad=new AlertDialog.Builder(setAlarmActivity.this).setTitle("Choose Challenge")
-                       .setSingleChoiceItems(games,-1,new AlertDialog.OnClickListener(){
-                           @Override
-                           public void onClick(DialogInterface dialog, int which){
-                               gameInfo.setText("Challenge: "+games[which]);
-                               challengeName=games[which];
-                               dialog.dismiss();
-                           }
-                       }).show();
-           }
+            @Override
+            public void onClick(View v){
+                AlertDialog ad=new AlertDialog.Builder(setAlarmActivity.this).setTitle("Choose Challenge")
+                        .setSingleChoiceItems(games,-1,new AlertDialog.OnClickListener(){
+                            @Override
+                            public void onClick(DialogInterface dialog, int which){
+                                gameInfo.setText("Challenge: "+games[which]);
+                                challengeName=games[which];
+                                dialog.dismiss();
+                            }
+                        }).show();
+            }
         });
 
         changeButton3=(Button)findViewById(R.id.change3);
         changeButton3.setOnClickListener(new View.OnClickListener(){
-           @Override
-           public void onClick(View v){
-               AlertDialog ad=new AlertDialog.Builder(setAlarmActivity.this).setTitle("Choose Ringtone")
-                       .setSingleChoiceItems(sampleSongList,-1,new AlertDialog.OnClickListener(){
-                           @Override
-                           public void onClick(DialogInterface dialog, int which){
-                               ringtoneInfo.setText("Ringtone: "+sampleSongList[which]);
-                               dialog.dismiss();
-                           }
-                       }).show();
-           }
+            @Override
+            public void onClick(View v){
+                AlertDialog ad=new AlertDialog.Builder(setAlarmActivity.this).setTitle("Choose Ringtone")
+                        .setSingleChoiceItems(sampleSongList,-1,new AlertDialog.OnClickListener(){
+                            @Override
+                            public void onClick(DialogInterface dialog, int which){
+                                ringtoneInfo.setText("Ringtone: "+sampleSongList[which]);
+                                ringToneName=sampleSongList[which];
+                                dialog.dismiss();
+                            }
+                        }).show();
+            }
         });
 
     }
@@ -218,6 +231,9 @@ public class setAlarmActivity extends AppCompatActivity {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         */
+        Intent intent=new Intent();
+        setResult(Activity.RESULT_OK, intent);
+
         setAlarmActivity.this.finish();
     }
 
@@ -228,6 +244,27 @@ public class setAlarmActivity extends AppCompatActivity {
         gameIntent=new Intent(this,ChallengeSwitchingActivity.class);
         gameIntent.putExtra("name",challengeName);
         gamePi=PendingIntent.getActivity(this,0,gameIntent,0);
+    }
+
+    public void writeToFile(){
+        try {
+            ostream = openFileOutput(fileName,Context.MODE_PRIVATE);
+
+            wrt("1\n");
+            wrt(shour+":"+sminute+"\n");
+            wrt(rpts+"\n");
+            wrt("Challenge: "+challengeName+"\n");
+            wrt("Ringtone: "+ringToneName+"\n");
+            ostream.flush();
+            ostream.close();
+
+        } catch (Exception e){
+
+        }
+    }
+
+    public void wrt(String s) throws Exception{
+        ostream.write(s.getBytes());
     }
 
 }

@@ -6,6 +6,15 @@
     android:layout_height="match_parent"
     tools:context="com.example.cosine.myapplication.AlarmRingingActivity">
 
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="375dp"
+        android:layout_height="241dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@android:drawable/screen_background_light" />
+
     <TextView
         android:id="@+id/question"
         android:layout_width="152dp"

@@ -12,6 +12,10 @@ import android.view.View;
 import android.util.*;
 import java.util.ArrayList;
 import java.util.Random;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+
 
 public class MyCanvas extends View {
 
@@ -38,6 +42,9 @@ public class MyCanvas extends View {
     float dx = 0;
     float dy = 0;
 
+    Bitmap bp; // blocks
+    Bitmap bp1; // player
+
     public MyCanvas(Context context) {
         super(context);
     }
@@ -48,7 +55,7 @@ public class MyCanvas extends View {
 
 
     ArrayList<int[]>  coords = new ArrayList<int[]>();
-    ArrayList<Integer> colors = new ArrayList<Integer>();
+    //ArrayList<Integer> colors = new ArrayList<Integer>();
 
 
     void setStPos(int l, int t, int r, int b) {
@@ -56,7 +63,7 @@ public class MyCanvas extends View {
         right = r;
         top = t;
         bottom = b;
-        drawPlayer((l+r)/2 -25,t -50,(l+r)/2 + 25, t );
+        drawPlayer((l+r)/2 - 40,t -80,(l+r)/2 + 40, t );
     }
 
     void addRect(int l, int t, int r, int b) {
@@ -75,13 +82,13 @@ public class MyCanvas extends View {
         top = t;
         bottom = b;
         Random rnd = new Random();
-        int col = Color.argb(255, rnd.nextInt(256),rnd.nextInt(256),rnd.nextInt(256));
-        colors.add(col);
+        //int col = Color.argb(255, rnd.nextInt(256),rnd.nextInt(256),rnd.nextInt(256));
+        //colors.add(col);
     }
 
     void removeRect() {
         coords.remove(0);
-        colors.remove(0);
+        //colors.remove(0);
     }
 
     void drawPlayer(float l, float t, float r, float b) {
@@ -106,7 +113,7 @@ public class MyCanvas extends View {
     @Override
     protected void onDraw(Canvas canvas)  {
         super.onDraw(canvas);
-        //paint.setColor(Color.BLUE);
+        paint.setColor(Color.BLUE);
         paint.setStrokeWidth(0);
 
         // draw rect
@@ -119,13 +126,15 @@ public class MyCanvas extends View {
             float top = coords.get(size)[1];
             float right = coords.get(size)[2];
             float bottom = coords.get(size)[3];
-            paint.setColor(colors.get(size));
-            canvas.drawRect(left,top,right,bottom,paint);
+            //paint.setColor(colors.get(size));
+            //canvas.drawRect(left,top,right,bottom,paint);
+            canvas.drawBitmap(bp,null,new RectF(left,top,right,bottom),null);
         }
 
         //draw player
         paint.setColor(Color.GREEN);
-        canvas.drawRect(player,paint);
+        //canvas.drawRect(player,paint);
+        canvas.drawBitmap(bp1,null,player,null);
         canvas.restore();
 
     }
@@ -151,6 +160,8 @@ public class MyCanvas extends View {
 
     void initialGame() {
         score = 0;
+        bp = BitmapFactory.decodeResource(getResources(),R.drawable.bk);
+        bp1 = BitmapFactory.decodeResource(getResources(),R.drawable.bb1);
         //starting position
         int sl = 100;
         int st= 500;

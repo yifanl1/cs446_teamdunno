@@ -1,5 +1,10 @@
 package com.example.cosine.myapplication;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -10,6 +15,12 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.EditText;
 import android.widget.Button;
+import android.widget.Toast;
+import android.widget.ImageView;
+import android.graphics.ColorMatrix;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.ColorMatrixColorFilter;
 
 import java.util.Random;
 
@@ -19,6 +30,8 @@ public class AlarmRingingActivity extends AppCompatActivity {
     TextView question;
     EditText answer;
     Button confirm;
+    Bitmap photo;
+    ImageView iv;
 
     int num1, num2, ans, correctCount, mode, userAns;
     String operators[]=new String[]{"+","-","×","÷"};
@@ -29,6 +42,8 @@ public class AlarmRingingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alarm_ringing);
+
+        iv=(ImageView)findViewById(R.id.imageView);
 
         mediaPlayer=new MediaPlayer();
         mediaPlayer=MediaPlayer.create(this, R.raw.onelasttime);
@@ -44,7 +59,7 @@ public class AlarmRingingActivity extends AppCompatActivity {
                 .setPositiveButton("Sure!", new DialogInterface.OnClickListener(){
                     @Override
                     public void onClick(DialogInterface dialog, int which){
-                        // maybe some transition to other games
+                        getPhoto();
                     }
                 }).show();
 
@@ -118,5 +133,58 @@ public class AlarmRingingActivity extends AppCompatActivity {
         questionDisplay=Integer.toString(num1)+operators[mode]+Integer.toString(num2);
         question.setText(questionDisplay);
         answer.setText("");
+    }
+
+    public void getPhoto(){
+        String state= Environment.getExternalStorageState();
+        if (state.equals(Environment.MEDIA_MOUNTED)){
+            Intent intent=new Intent("android.media.action.IMAGE_CAPTURE");
+            startActivityForResult(intent,1);
+        } else {
+            Toast.makeText(AlarmRingingActivity.this,"sdcard not available",Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode,resultCode,data);
+        if (data!=null){
+            if (data.getData()!=null || data.getExtras()!=null){
+                Uri uri=data.getData();
+                if (uri!=null){
+                    photo= BitmapFactory.decodeFile(uri.getPath());
+                }
+                if (photo==null){
+                    photo=(Bitmap)data.getExtras().get("data");
+                    //iv.setImageBitmap(photo);
+                }
+                //iv.setImageBitmap(photo);
+
+                ColorMatrix matrix=new ColorMatrix();
+                float scale=(float)1.5;
+                matrix.setScale(scale,scale,scale,1);
+                //photo.setWidth(iv.getWidth());
+                //photo.setHeight(iv.getHeight());
+
+                //Canvas canvas=new Canvas(photo);
+                //Paint paint=new Paint();
+                //paint.setAntiAlias(true);
+                /*
+                paint.setColorFilter(new ColorMatrixColorFilter(matrix));
+                canvas.drawBitmap(photo,0,0,paint);
+                */
+                iv.setImageBitmap(photo);
+                /*
+                float height=iv.getMaxHeight();
+                float width=iv.getMaxWidth();
+                int orgHeight=photo.getHeight();
+                int orgWidth=photo.getWidth();
+                Matrix matrix=new Matrix();
+                */
+                //matrix.postScale(width/(float)orgWidth,height/(float)orgHeight);
+                //Bitmap bg=Bitmap.createBitmap(photo,0,0,orgWidth,orgHeight,matrix,false);
+                //iv.setImageBitmap(bg);
+            }
+        }
     }
 }
